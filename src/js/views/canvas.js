@@ -73,7 +73,7 @@ export class letterBlock {
     isDrag(e) {
         if (e.offsetX > this.x && e.offsetX < this.x2 && e.offsetY > this.y && e.offsetY < this.y2) {
             this.drag = true;
-            //console.log(`${this.text} is ready to drag!`)
+            console.log(`${this.text} is ready to drag!`)
         } else {
             this.drag = false;
         };
@@ -90,13 +90,53 @@ export class letterBlock {
             this.y2 = e.offsetY + (this.h / 2);
 
             this.rectColor = '#229552';
-
+            
             this.lw = this.x + (this.w * .33);
             this.lh = this.y + (this.h * .75);
-
-            this.rectDraw();
-            this.letterDraw();
         }
+    }
+
+    draggingPulse() {
+        
+        if (this.drag) {
+            let originalW, originalH, original, perChange;
+            
+            originalW = this.w;
+            originalH = this.h;
+            original = 10
+            perChange = original / 100;
+
+            this.dragPulseFn = setInterval(() => {
+                //increase size of block if w and h are less than 110% of original w and h
+                
+                if (this.drag) {
+                    if (this.w < originalW * 1.5 && this.h < originalH * 1.5) {
+                        //incrementally increase size of w and h
+                        //elements.ctx.clearRect(this.x, this.y, this.w, this.h);
+                        
+                        this.w = originalW * (perChange + 1);
+                        this.h = originalH * (perChange + 1);
+    
+                        original++;
+                        
+                        //else, decrease size of block until w and h are original size
+                    } else {
+                        //elements.ctx.clearRect(this.x, this.y, this.w, this.h);
+                        
+                        this.w = originalW;
+                        this.h = originalH;
+    
+                    }
+                } else {
+                        this.w = originalW;
+                        this.h = originalH;
+                    
+                    clearInterval(this.dragPulseFn);
+                }
+                
+            }, 50);
+        };
+        
     }
     
     isCollide(otherBlocks) {
@@ -202,7 +242,7 @@ export class letterBlock {
         
     }
 
-    push() {
+    push(canvasWidth, canvasHeight) {
         if (!this.inCanvas) {
 
             elements.ctx.clearRect(this.x, this.y, this.w, this.h);
@@ -224,8 +264,10 @@ export class letterBlock {
                 this.y = this.y + 2;
     
             } else {
+                //reset for when you have multiple collisions in a stack at side of canvas
+                this.x = ((canvasWidth / 2) - (this.w / 2));
+                this.y = ((canvasHeight / 2) - (this.h / 2));
 
-                this.x = 300;
             }
     
             this.lw = this.x + (this.w *  .33);
@@ -260,6 +302,10 @@ export class letterBlock {
 
         this.rectDraw();
         this.letterDraw();
+    }
+
+    endDraggingPulse() {
+        if (this.drag === false) clearInterval(this.dragPulseFn);
     }
 
 };
