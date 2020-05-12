@@ -1,0 +1,65 @@
+/* For Mobile */
+
+@media only screen and (max-width: 1079px) {
+    
+    .container {
+        object-position: center;
+        text-align: center;
+        padding: 3px;
+    }    
+
+    button {
+        border-radius: 200px;
+        padding: 5px 10px;
+        font-size: 20px;
+    }
+
+    .interface {
+        margin-top: 5px;
+    }
+    
+    input {
+        margin-bottom: 3px;
+    }
+    
+    .timer,
+    .gameState {
+        font-size: 75%;
+    }
+}
+
+@media screen and (max-width: 812px) {
+    
+    h1 {
+        font-size: 30px;
+        margin: 0 0 10px 0;
+    }
+
+    .wordInput,
+    .buildButton {
+        display:inline-block;
+    }
+
+    .interface {
+        margin-top: 1px;
+        display: inline-block;
+    }
+
+    .gameState,
+    .timer {
+        margin-bottom: 0px;
+        display: inline-block;
+    }
+
+    button {
+        border-radius: 200px;
+        padding: 3px 5px;
+        font-size: 15px;
+    }
+    
+    input {
+        margin-bottom: 1px;
+        max-width: 75%;
+        font-size:15px;
+    }
+}

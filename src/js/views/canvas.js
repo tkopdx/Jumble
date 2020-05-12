@@ -15,6 +15,12 @@ export const canvasLetter = (px = 70) => {
     ctx.font = `${px}px Roboto Condensed`;
 }
 
+export const startMessage = (width, height) => {
+    ctx.fillStyle = 'black';
+    ctx.fillText('Drag to start!', width, height);
+    canvasLetter(50);
+};
+
 export class letterBlock {
     constructor(x, y, w, h, lw, lh, rectColor, letterColor, text, id) {
         this.x = x;
@@ -69,26 +75,28 @@ export class letterBlock {
         }
     }
 
-    isDrag(e) {
-        if (e.offsetX > this.x && e.offsetX < this.x2 && e.offsetY > this.y && e.offsetY < this.y2) {
+    isDrag(touchX, touchY) {
+        if (touchX > this.x && touchX < this.x2 && touchY > this.y && touchY < this.y2) {
             this.drag = true;
-            //this.collide = false;
-            //console.log(`${this.text} is ready to drag!`)
+            console.log(`${this.text} is ready to drag.`)
         }
     }
 
-    dragging(e) {
+    dragging(touchX, touchY) {
         if (this.drag) {
             
-            this.x = e.offsetX - (this.w / 2);
-            this.x2 = e.offsetX + (this.w / 2);
-            this.y = e.offsetY - (this.h / 2);
-            this.y2 = e.offsetY + (this.h / 2);
+            this.x = touchX - (this.w / 2);
+            this.x2 = touchX + (this.w / 2);
+            this.y = touchY - (this.h / 2);
+            this.y2 = touchY + (this.h / 2);
 
             this.rectColor = '#229552';
             
-            this.lw = this.x + (this.w * .33);
-            this.lh = this.y + (this.h * .75);
+
+            // this.lw = (this.x - ((e.offsetX - this.x2) * 1.3));
+            // this.lh = (this.y + (this.h * .75));
+            // this.lw = (this.x + (this.w * .33));
+            // this.lh = (this.y + (this.h * .75));
         }
     }
 
@@ -137,7 +145,7 @@ export class letterBlock {
     
     isCollide(otherBlocks) {
         
-        if (!this.drag) {
+        if (true) {
             
             let oLeft, oRight, oTop, oBottom;
 
@@ -157,39 +165,44 @@ export class letterBlock {
                     oTop = el.y;
                     oBottom = el.y + el.h;
 
-                    //console.log(`${el.text}: ${oLeft}, ${oRight}, ${oTop}, ${oBottom}`);
+                    //console.log(`This ${this.text} detects ${el.text}: ${oLeft}, ${oRight}, ${oTop}, ${oBottom}`);
 
                     let collisionStates = {
                         1: 'right',
                         2: 'left',
                         3: 'top',
-                        4: 'bottom'
+                        4: 'bottom',
+                        5: 'overlay'
                     };
                     
-                    if ((oBottom > this.top && oBottom < this.bottom) || (oTop < this.bottom && oBottom > this.bottom)) {
+                    if (oRight === this.right && oLeft === this.left && oBottom === this.bottom && oTop === this.top) {
+                        // console.log(`${this.text} is on top of ${el.text}`);
+                        this.collide = collisionStates[5];
+                        this.collidingBlockEdge = null;
+                    } else if ((oBottom > this.top && oBottom <= this.bottom) || (oTop < this.bottom && oBottom >= this.bottom)) {
                         
                         //check left and right
                         if (oLeft < this.right && oLeft > this.left) {
                             this.collide = collisionStates[1];
                             this.collidingBlockEdge = oLeft;
-                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            // console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         } else if (oRight > this.left && oRight < this.right) {
                             this.collide = collisionStates[2];
                             this.collidingBlockEdge = oRight;
-                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            // console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         }
                         
-                    } else if ((oRight > this.left && oRight < this.right) || (oLeft < this.right && oLeft > this.left)) {
+                    } else if ((oRight > this.left && oRight <= this.right) || (oLeft < this.right && oLeft >= this.left)) {
                         
                         //check top and bottom
                         if (oBottom > this.top && oBottom < this.bottom) {
                             this.collide = collisionStates[3];
                             this.collidingBlockEdge = oBottom;
-                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            // console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         } else if (oTop > this.bottom && oTop < this.top) {
                             this.collide = collisionStates[4];
                             this.collidingBlockEdge = oTop;
-                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            // console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         }
                     
                     }
@@ -224,7 +237,7 @@ export class letterBlock {
                 
                 this.y = this.collidingBlockEdge;
             
-            } else {
+            } else if (this.collide === 'bottom'){
                 
                 this.y = this.collidingBlockEdge - this.h;
     
@@ -237,23 +250,33 @@ export class letterBlock {
     }
 
     push(canvasWidth, canvasHeight) {
-        if (!this.inCanvas) {
+        
+        //console.log(this.collide);
+
+        //console.log(this.inCanvas);
+
+        if (this.collide === 'overlay') {
+            // console.log('fixing overlay')
+                
+            this.x = canvasWidth / this.id;
+            this.y = canvasHeight / this.id;
+        } else if (!this.inCanvas) {
 
             if (this.collide === 'right') {
                 
-                console.log(`${this.text} is resetting ${this.collide}`);
+                // console.log(`${this.text} is resetting ${this.collide}`);
                 this.x = this.x + 20;
             
             } else if (this.collide === 'left') {
-                console.log(`${this.text} is resetting ${this.collide}`);
+                // console.log(`${this.text} is resetting ${this.collide}`);
                 this.x = this.x - 20;
             
             } else if (this.collide === 'top') {
-                console.log(`${this.text} is resetting ${this.collide}`);
+                // console.log(`${this.text} is resetting ${this.collide}`);
                 this.y = this.y - 20;
             
             } else if (this.collide === 'bottom') {
-                console.log(`${this.text} is resetting ${this.collide}`);
+                // console.log(`${this.text} is resetting ${this.collide}`);
                 this.y = this.y + 20;
     
             } else {
@@ -262,12 +285,9 @@ export class letterBlock {
                 this.y = ((canvasHeight / 2) - (this.h / 2));
 
             }
-    
-            this.lw = this.x + (this.w *  .33);
-            this.lh = this.y + (this.h * .75);
-    
-
         };
+        this.lw = this.x + (this.w *  .33);
+        this.lh = this.y + (this.h * .75);
     }
 
     resize (numOfBlocks, canvasWidth, canvasHeight, perChangeWidth, perChangeHeight) {
@@ -277,8 +297,8 @@ export class letterBlock {
         this.x = this.x * perChangeWidth;
         this.y = this. y * perChangeHeight;
 
-        this.lw = this.x + (this.w *  .33);
-        this.lh = this.y + (this.h * .75);
+        this.lw = this.x + (this.w *  .2);
+        this.lh = this.y + (this.h * .6);
 
     }
 
