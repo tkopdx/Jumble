@@ -88,11 +88,11 @@ const inline = (arr) => {
             i++
     });
 
-    return final(checks);
+    return arrVerify(checks);
 
 }
 
-export let final = (checks) => {
+export let arrVerify = (checks) => {
     if (checks.includes(false)) {
         //console.log('still not inline');
         return false;

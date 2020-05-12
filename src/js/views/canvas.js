@@ -27,7 +27,6 @@ export class letterBlock {
         this.letterColor = letterColor;
         this.text = text;
         this.id = id;
-        this.drag = false;
     }
 
     rectDraw() {
@@ -73,16 +72,13 @@ export class letterBlock {
     isDrag(e) {
         if (e.offsetX > this.x && e.offsetX < this.x2 && e.offsetY > this.y && e.offsetY < this.y2) {
             this.drag = true;
-            console.log(`${this.text} is ready to drag!`)
-        } else {
-            this.drag = false;
-        };
+            //this.collide = false;
+            //console.log(`${this.text} is ready to drag!`)
+        }
     }
 
     dragging(e) {
         if (this.drag) {
-            
-            elements.ctx.clearRect(this.x, this.y, this.w, this.h);
             
             this.x = e.offsetX - (this.w / 2);
             this.x2 = e.offsetX + (this.w / 2);
@@ -176,11 +172,11 @@ export class letterBlock {
                         if (oLeft < this.right && oLeft > this.left) {
                             this.collide = collisionStates[1];
                             this.collidingBlockEdge = oLeft;
-                            console.log(`${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         } else if (oRight > this.left && oRight < this.right) {
                             this.collide = collisionStates[2];
                             this.collidingBlockEdge = oRight;
-                            console.log(`${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         }
                         
                     } else if ((oRight > this.left && oRight < this.right) || (oLeft < this.right && oLeft > this.left)) {
@@ -189,17 +185,14 @@ export class letterBlock {
                         if (oBottom > this.top && oBottom < this.bottom) {
                             this.collide = collisionStates[3];
                             this.collidingBlockEdge = oBottom;
-                            console.log(`${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         } else if (oTop > this.bottom && oTop < this.top) {
                             this.collide = collisionStates[4];
                             this.collidingBlockEdge = oTop;
-                            console.log(`${this.text} is colliding with ${el.text} from ${this.collide}.`);
+                            console.log(`This ${this.text} is colliding with ${el.text} from ${this.collide}.`);
                         }
                     
-                    } else {
-                        //console.log(`${this.text} is not colliding`);
-                        this.collide = false;
-                    };
+                    }
 
                 };
 
@@ -211,12 +204,16 @@ export class letterBlock {
     
     colliding() {
         
+        // console.log(this);
+        
+        //console.log(`${this.text}, ${this.collide}`);
+
         if (this.collide) {
             
-            elements.ctx.clearRect(this.x, this.y, this.w, this.h);
+            //console.log(`${this.text}yes`);
             
             if (this.collide === 'right') {
-                
+                //console.log(`${this.text} is resetting to ${this.collidingBlockEdge}`);
                 this.x = this.collidingBlockEdge - this.w;
             
             } else if (this.collide === 'left') {
@@ -235,9 +232,6 @@ export class letterBlock {
     
             this.lw = this.x + (this.w *  .33);
             this.lh = this.y + (this.h * .75);
-    
-            this.rectDraw();
-            this.letterDraw();
         };
         
     }
@@ -245,23 +239,22 @@ export class letterBlock {
     push(canvasWidth, canvasHeight) {
         if (!this.inCanvas) {
 
-            elements.ctx.clearRect(this.x, this.y, this.w, this.h);
-
             if (this.collide === 'right') {
-           
-                this.x = this.x + 2;
+                
+                console.log(`${this.text} is resetting ${this.collide}`);
+                this.x = this.x + 20;
             
             } else if (this.collide === 'left') {
-                
-                this.x = this.x - 2;
+                console.log(`${this.text} is resetting ${this.collide}`);
+                this.x = this.x - 20;
             
             } else if (this.collide === 'top') {
-                
-                this.y = this.y - 2;
+                console.log(`${this.text} is resetting ${this.collide}`);
+                this.y = this.y - 20;
             
             } else if (this.collide === 'bottom') {
-                
-                this.y = this.y + 2;
+                console.log(`${this.text} is resetting ${this.collide}`);
+                this.y = this.y + 20;
     
             } else {
                 //reset for when you have multiple collisions in a stack at side of canvas
@@ -287,8 +280,6 @@ export class letterBlock {
         this.lw = this.x + (this.w *  .33);
         this.lh = this.y + (this.h * .75);
 
-        this.rectDraw();
-        this.letterDraw();
     }
 
     endCollide() {
@@ -299,9 +290,6 @@ export class letterBlock {
 
         this.drag = false;
         this.rectColor = '#2ecc71';
-
-        this.rectDraw();
-        this.letterDraw();
     }
 
     endDraggingPulse() {
